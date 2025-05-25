@@ -1,57 +1,83 @@
 import streamlit as st
 import re
 
-st.set_page_config(page_title="Fuvar szöveggenerátor", page_icon="🚌", layout="centered")
-st.title("Fuvar szöveggenerátor")
+st.set_page_config(page_title="Fuvar szöveggenerátor", layout="centered")
 
-input_text = st.text_area("Illeszd be a sort a Google Sheets-ből (több szóközzel vagy tabbal elválasztva):")
+st.title("🚌 szöveggenerátor")
+st.write("Illeszd be a sort a Google Sheets-ből (több szóközzel vagy tabbal elválasztva):")
 
-if st.button("Szöveg generálása"):
-    try:
-        # Több szóköz vagy tab mentén bontja a szöveget
-        parts = re.split(r'\s{2,}|\t+', input_text.strip())
+raw_input = st.text_area("Fuvarsor beillesztése", height=150)
 
-        if len(parts) < 13:
-            st.warning("Úgy tűnik, nem teljes a sor. Legalább 13 mező kell.")
-            st.text(f"{len(parts)} mezőt találtam: {parts}")
-        else:
-            # Változók hozzárendelése
-            munkaszam = parts[0]
-            datum_indulas = parts[1]
-            datum_vege = parts[2]
-            orszag = parts[3]
-            kiallas_idopont = parts[4]
-            kiallas_hely = parts[5]
-            uticel = parts[6]
-            rendszam = parts[7]
-            letszam = parts[8]
-            vezeteknev = parts[9]
-            keresztnev = parts[10]
-            telefonszam = parts[11]
-            diszpecser = parts[12]
+def extract_fields(text):
+    parts = re.split(r'\s{2,}|\t+', text.strip())
 
-            # Dátumrész a szöveg elejére
-            if datum_indulas == datum_vege:
-                datum_resz = f"Küldöm a munkát {datum_indulas} napra."
-            else:
-                datum_resz = f"Küldöm a munkát {datum_indulas} - {datum_vege} napokra."
+    # Rendszám
+    rendszam = next((x for x in parts if re.match(r'^[A-Z]{3}-\d{3}$', x)), 'N/A')
 
-            # Szöveg sablon
-            output = f"""
-            Szia, {keresztnev} 👋
+    # Telefonszám
+    telefonszam = next((x for x in parts if '+36' in x), 'N/A')
 
-            {datum_resz}
+    # Időpont (pl. 7:15, 16:00)
+    idopontok = [x for x in parts if re.match(r'^\d{1,2}:\d{2}$', x)]
+    kiallas_ido = idopontok[0] if idopontok else 'N/A'
 
-            *Kiállás időpontja:* {datum_indulas}, {kiallas_idopont}  
-            *Kiállás helye:* {kiallas_hely}  
-            *Úticél:* {uticel}  
-            *Busz:* {rendszam}  
-            *Várható végzés:* {datum_vege}  
-            *Létszám:* {letszam}
-            """
+    # Dátum (pl. 2025.05.21)
+    datumok = [x for x in parts if re.match(r'^\d{4}\.\d{2}\.\d{2}$', x)]
+    if len(datumok) == 1:
+        indulas = datumok[0]
+        vegzes = datumok[0]
+    elif len(datumok) >= 2:
+        indulas = datumok[0]
+        vegzes = datumok[1]
+    else:
+        indulas = vegzes = 'N/A'
 
-            st.markdown(output)
+    # Létszám: szám típusú mező
+    letszam = next((x for x in parts if re.match(r'^\d+$', x)), 'N/A')
 
-    except Exception as e:
-        st.error("Valami hiba történt. Ellenőrizd a bemásolt sort.")
-        st.exception(e)
+    # Sofőr név
+    if telefonszam in parts:
+        idx = parts.index(telefonszam)
+        sofor_nev = " ".join(parts[idx - 2:idx]) if idx >= 2 else 'N/A'
+        sofor_keresztnev = parts[idx - 1] if idx >= 1 else 'N/A'
+    else:
+        sofor_nev = sofor_keresztnev = 'N/A'
+
+    # Úticél: az első hosszabb cím-szerű mező
+    uticel = next((x for x in parts if len(x.split()) > 1 and re.search(r'[a-záéíóöőúüű]', x, re.IGNORECASE)), 'N/A')
+
+    return {
+        "sofor_teljesnev": sofor_nev,
+        "sofor_keresztnev": sofor_keresztnev,
+        "telefonszam": telefonszam,
+        "rendszam": rendszam,
+        "kiallas_datum": indulas,
+        "kiallas_idopont": kiallas_ido,
+        "vegzes_datum": vegzes,
+        "uticel": uticel,
+        "letszam": letszam
+    }
+
+if st.button("Szöveg generálása") and raw_input.strip():
+    data = extract_fields(raw_input)
+
+    if data["kiallas_datum"] == data["vegzes_datum"]:
+        datum_szoveg = f"{data['kiallas_datum']} napra."
+    else:
+        datum_szoveg = f"{data['kiallas_datum']} - {data['vegzes_datum']} napokra."
+
+    output = f"""Szia, {data['sofor_keresztnev']} 👋
+
+Küldöm a munkát {datum_szoveg}
+
+*Kiállás időpontja:* {data['kiallas_datum']}, {data['kiallas_idopont']}
+*Kiállás helye:* —
+*Úticél:* {data['uticel']}
+*Busz:* {data['rendszam']}
+*Várható végzés:* {data['vegzes_datum']}
+*Létszám:* {data['letszam']}
+"""
+
+    st.markdown("### ✏️ Generált szöveg")
+    st.text_area("Másolható szöveg", output, height=250)
+    st.download_button("📋 Szöveg másolása", output, file_name="fuvar_szoveg.txt", mime="text/plain")
