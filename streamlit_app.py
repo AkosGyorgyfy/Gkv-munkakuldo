@@ -1,13 +1,12 @@
 def extract_fields(text):
-    parts = re.split(r'\s{2,}|\t+', text.strip())
+    import re
 
-    # Rendszám
-    rendszam = next((x for x in parts if re.match(r'^[A-Z]{3}-\d{3}$', x)), 'N/A')
+    parts = re.split(r'\s{2,}|\t+', text.strip())
 
     # Telefonszám
     telefonszam = next((x for x in parts if '+36' in x), 'N/A')
 
-    # Sofőr név a telefonszám előtti két mező alapján (csak ha nem szám)
+    # Sofőr név
     if telefonszam in parts:
         idx = parts.index(telefonszam)
         if idx >= 2 and not parts[idx - 1].isdigit():
@@ -15,29 +14,27 @@ def extract_fields(text):
             sofor_keresztnev = parts[idx - 1]
             sofor_nev = f"{sofor_vezeteknev} {sofor_keresztnev}"
         else:
-            sofor_nev = sofor_keresztnev = 'N/A'
+            sofor_keresztnev = sofor_nev = 'N/A'
     else:
-        sofor_nev = sofor_keresztnev = 'N/A'
+        sofor_keresztnev = sofor_nev = 'N/A'
 
     # Dátumok
     datumok = [x for x in parts if re.match(r'^\d{4}\.\d{2}\.\d{2}$', x)]
-    if len(datumok) == 1:
-        indulas = vegzes = datumok[0]
-    elif len(datumok) >= 2:
-        indulas = datumok[0]
-        vegzes = datumok[1]
-    else:
-        indulas = vegzes = 'N/A'
+    indulas = datumok[0] if len(datumok) > 0 else 'N/A'
+    vegzes = datumok[1] if len(datumok) > 1 else indulas
 
     # Időpontok
     idopontok = [x for x in parts if re.match(r'^\d{1,2}:\d{2}$', x)]
     kiallas_ido = idopontok[0] if idopontok else 'N/A'
 
-    # Létszám: az első szám típusú érték, ami nem telefonszám előtt van
-    letszam = next((x for x in parts if re.match(r'^\d{1,3}$', x) and x != kiallas_ido.split(":")[0]), 'N/A')
+    # Rendszám
+    rendszam = next((x for x in parts if re.match(r'^[A-Z]{3}-\d{3}$', x)), 'N/A')
 
-    # Úticél: első cím-szerű szöveg, ami tartalmaz kisbetűt
-    uticel = next((x for x in parts if len(x.split()) > 1 and re.search(r'[a-záéíóöőúüű]', x, re.IGNORECASE)), 'N/A')
+    # Létszám (az első szám, ami nem időpont és nem dátum)
+    letszam = next((x for x in parts if re.match(r'^\d+$', x)), 'N/A')
+
+    # Úticél (legelső cím-szerű, hosszabb mező, amin van kisbetű)
+    uticel = next((x for x in parts if len(x) > 6 and re.search(r'[a-záéíóöőúüű]', x, re.IGNORECASE)), 'N/A')
 
     return {
         "sofor_teljesnev": sofor_nev,
