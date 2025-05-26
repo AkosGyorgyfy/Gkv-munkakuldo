@@ -1,49 +1,59 @@
-def extract_fields(text):
-    import re
+import streamlit as st
+from datetime import datetime
 
-    parts = re.split(r'\s{2,}|\t+', text.strip())
+st.title("🚌 Sofőrüzenet Generátor")
 
-    # Telefonszám
-    telefonszam = next((x for x in parts if '+36' in x), 'N/A')
+st.write("Másold be egy fuvar adatsorát a Google Sheets-ből (TAB-delimitált formátumban):")
 
-    # Sofőr név
-    if telefonszam in parts:
-        idx = parts.index(telefonszam)
-        if idx >= 2 and not parts[idx - 1].isdigit():
-            sofor_vezeteknev = parts[idx - 2]
-            sofor_keresztnev = parts[idx - 1]
-            sofor_nev = f"{sofor_vezeteknev} {sofor_keresztnev}"
-        else:
-            sofor_keresztnev = sofor_nev = 'N/A'
+input_text = st.text_area("Fuvar adatsor", height=200)
+
+# Oszlopsorrend alapján (27+ oszlop)
+column_names = [
+    "Iktatószám", "Fuvar kezdete", "Fuvar vége", "Országkód", "Kiállás időpontja",
+    "Kiállás helye", "Úticél", "Fuvar végének időpontja", "Rendszám", "Utánfutó",
+    "UtasLétszám", "Gkv I.", "Gkv II.", "Gkv III.", "Gkv IV.",
+    "Megrendelő", "Megrendelő II.", "Kapcsolattartó", "Email", "Telefonszám",
+    "Fuvarozó neve", "Kü/Bf", "Ellátás típusa", "Megjegyzés 1", "Megjegyzés 2",
+    "Megjegyzés 3", "Megjegyzés 4"
+]
+
+def parse_row(row_text):
+    parts = row_text.strip().split("\t")
+    # Kiegészítjük üres mezőkkel, ha kevesebb van
+    parts += [""] * (len(column_names) - len(parts))
+    return dict(zip(column_names, parts))
+
+def generate_message(data):
+    gkv = data.get("Gkv I.", "").strip()
+    if not gkv:
+        return "⚠️ Nincs megadva sofőr (Gkv I.)"
+
+    start_day = data.get("Fuvar kezdete", "").strip()
+    end_day = data.get("Fuvar vége", "").strip()
+    vege_ido = data.get("Fuvar végének időpontja", "").strip()
+    
+    if start_day == end_day or not end_day:
+        date_part = f"Küldöm a munkát {start_day} napra"
     else:
-        sofor_keresztnev = sofor_nev = 'N/A'
+        date_part = f"Küldöm a munkát {start_day} - {vege_ido} napokra"
 
-    # Dátumok
-    datumok = [x for x in parts if re.match(r'^\d{4}\.\d{2}\.\d{2}$', x)]
-    indulas = datumok[0] if len(datumok) > 0 else 'N/A'
-    vegzes = datumok[1] if len(datumok) > 1 else indulas
+    return f"""Szia, {gkv}!
 
-    # Időpontok
-    idopontok = [x for x in parts if re.match(r'^\d{1,2}:\d{2}$', x)]
-    kiallas_ido = idopontok[0] if idopontok else 'N/A'
+{date_part}
 
-    # Rendszám
-    rendszam = next((x for x in parts if re.match(r'^[A-Z]{3}-\d{3}$', x)), 'N/A')
+*Kiállás időpontja:* {start_day}, {data.get('Kiállás időpontja', '').strip()}
+*Kiállás helye:* {data.get('Kiállás helye', '').strip()}
+*Úticél:* {data.get('Úticél', '').strip()}
+*Busz:* {data.get('Rendszám', '').strip()}
+*Várható végzés:* {vege_ido}
+*Létszám:* {data.get('UtasLétszám', '').strip()}
+"""
 
-    # Létszám (az első szám, ami nem időpont és nem dátum)
-    letszam = next((x for x in parts if re.match(r'^\d+$', x)), 'N/A')
-
-    # Úticél (legelső cím-szerű, hosszabb mező, amin van kisbetű)
-    uticel = next((x for x in parts if len(x) > 6 and re.search(r'[a-záéíóöőúüű]', x, re.IGNORECASE)), 'N/A')
-
-    return {
-        "sofor_teljesnev": sofor_nev,
-        "sofor_keresztnev": sofor_keresztnev,
-        "telefonszam": telefonszam,
-        "rendszam": rendszam,
-        "kiallas_datum": indulas,
-        "kiallas_idopont": kiallas_ido,
-        "vegzes_datum": vegzes,
-        "uticel": uticel,
-        "letszam": letszam
-    }
+if input_text:
+    try:
+        adat = parse_row(input_text)
+        uzenet = generate_message(adat)
+        st.success("🎉 Üzenet legenerálva:")
+        st.text_area("Sofőrnek küldendő üzenet:", value=uzenet, height=200)
+    except Exception as e:
+        st.error(f"Hiba történt: {e}")
