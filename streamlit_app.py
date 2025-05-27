@@ -35,7 +35,7 @@ def generate_message(data):
     if start_day == end_day or not end_day:
         date_part = f"Küldöm a munkát {start_day} napra"
     else:
-        date_part = f"Küldöm a munkát {start_day} - {vege_ido} napokra"
+        date_part = f"Küldöm a munkát {start_day} - {end_day} napokra"
 
     return f"""Szia, {gkv}!
 
