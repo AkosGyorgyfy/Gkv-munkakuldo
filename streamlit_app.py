@@ -37,7 +37,7 @@ def generate_message(data):
     else:
         date_part = f"Küldöm a munkát {start_day} - {end_day} napokra"
 
-    return f"""Szia, {gkv}!
+    return f"""Szia,!
 
 {date_part}
 
