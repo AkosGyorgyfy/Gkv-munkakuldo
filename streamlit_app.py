@@ -12,7 +12,7 @@ column_names = [
     "Iktatószám", "Fuvar kezdete", "Fuvar vége", "Országkód", "Kiállás időpontja",
     "Kiállás helye", "Úticél", "Fuvar végének időpontja", "Rendszám", "Utánfutó",
     "UtasLétszám", "Gkv I.", "Gkv II.", "Gkv III.", "Gkv IV.",
-    "Megrendelő", "Megrendelő II.", "Kapcsolattartó", "Email", "Telefonszám",
+    "Fuvarozó", "Megrendelő", "Kapcsolattartó", "Email", "Telefonszám",
     "Fuvarozó neve", "Kü/Bf", "Ellátás típusa", "Megjegyzés 1", "Megjegyzés 2",
     "Megjegyzés 3", "Megjegyzés 4"
 ]
