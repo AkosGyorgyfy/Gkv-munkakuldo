@@ -44,10 +44,19 @@ def generate_message(data):
 *Kiállás időpontja:* {start_day}, {data.get('Kiállás időpontja', '').strip()}
 *Kiállás helye:* {data.get('Kiállás helye', '').strip()}
 *Úticél:* {data.get('Úticél', '').strip()}
+*Program:* 
+*Útdíj:* 
+*Szállás/ellátás:* 
+*Tankolás:* 
 *Busz:* {data.get('Rendszám', '').strip()}
 *Várható végzés:* {vege_ido}
 *Létszám:* {data.get('UtasLétszám', '').strip()}
 *Megrendelő:* {data.get('Megrendelő', '').strip()}
+
+Bármi komolyabb program változás van, azt kérjük azonnal jelezni!!!
+
+Tankolókártyákat, bankkártyákat, mikrofont, úti okmányaidat (ÚTLEVÉL!), indulás előtt, otthon is ellenőrizni!
+A FUVAR VÉGÉN KÉRJÜK AZ AUTÓBUSZT MINDIG MEGTANKOLVA ÉS RENDBEN LETENNI!
 """
 
 if input_text:
