@@ -45,7 +45,7 @@ def generate_message(data):
 *Kiállás helye:* {data.get('Kiállás helye', '').strip()}
 *Úticél:* {data.get('Úticél', '').strip()}
 *Program:* 
-*Útdíj:* 
+*Szükséges útdíjak:* Magyar
 *Szállás/ellátás:* 
 *Tankolás:* 
 *Busz:* {data.get('Rendszám', '').strip()}
@@ -56,7 +56,9 @@ def generate_message(data):
 Bármi komolyabb program változás van, azt kérjük azonnal jelezni!!!
 
 Tankolókártyákat, bankkártyákat, mikrofont, úti okmányaidat (ÚTLEVÉL!), indulás előtt, otthon is ellenőrizni!
-A FUVAR VÉGÉN KÉRJÜK AZ AUTÓBUSZT MINDIG MEGTANKOLVA ÉS RENDBEN LETENNI!
+A FUVAR VÉGÉN KÉRJÜK AZ AUTÓBUSZT MINDIG MEGTANKOLVA ÉS KITAKARÍTVA LETENNI!
+
+BÁRMILYEN FELMERÜLŐ MŰSZAKI HIBÁT KÉRJÜK AZONNAL JELEZNI!
 """
 
 if input_text:
