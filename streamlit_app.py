@@ -9,7 +9,7 @@ input_text = st.text_area("Fuvar adatsor", height=200)
 
 # Oszlopsorrend alapján (27+ oszlop)
 column_names = [
-    "Iktatószám", "Fuvar kezdete", "Fuvar vége", "Országkód", "Kiállás időpontja",
+    "Iktatószám", "Fuvar kezdete", "Fuvar vége", "Országkód", "Telephelyre érkezés", "Kiállás időpontja",
     "Kiállás helye", "Úticél", "Fuvar végének időpontja", "Rendszám", "Utánfutó",
     "UtasLétszám", "Gkv I.", "Gkv II.", "Gkv III.", "Gkv IV.",
     "Fuvarozó", "Megrendelő", "Kapcsolattartó", "Email", "Telefonszám",
