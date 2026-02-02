@@ -41,6 +41,7 @@ def generate_message(data):
 
 {date_part}
 
+*Telephelyre érkezés:* {data.get('Telephelyre érkezés', '').strip()}
 *Kiállás időpontja:* {start_day}, {data.get('Kiállás időpontja', '').strip()}
 *Kiállás helye:* {data.get('Kiállás helye', '').strip()}
 *Úticél:* {data.get('Úticél', '').strip()}
