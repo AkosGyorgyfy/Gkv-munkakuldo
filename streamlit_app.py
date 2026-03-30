@@ -53,6 +53,8 @@ def generate_message(data):
 *Várható végzés:* {vege_ido}
 *Létszám:* {data.get('UtasLétszám', '').strip()}
 *Megrendelő:* {data.get('Megrendelő', '').strip()}
+*Kapcsolattartó:* {data.get('Kapcsolattartó', '').strip()}
+*Kapcsolattartó telefonszáma:* {data.get('Telefonszám', '').strip()}
 
 Bármi komolyabb program változás van, azt kérjük azonnal jelezni!!!
 
