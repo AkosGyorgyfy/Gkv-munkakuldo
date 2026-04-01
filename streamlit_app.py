@@ -12,7 +12,7 @@ column_names = [
     "Iktatószám", "Fuvar kezdete", "Fuvar vége", "Országkód", "Telephelyre érkezés", "Kiállás időpontja",
     "Kiállás helye", "Úticél", "Fuvar végének időpontja", "Rendszám", "Utánfutó",
     "UtasLétszám", "Gkv I.", "Gkv II.", "Gkv III.", "Gkv IV.",
-    "Fuvarozó", "Megrendelő", "Megrendelő II.", "Kapcsolattartó", "Email", "Telefonszám",
+    "Fuvarozó", "Megrendelő", "Megrendelő II.", "Kapcsolattartó", "Email", "Telefonszám", "Fizetés módja",
     "Fuvarozó neve", "Kü/Bf", "Ellátás típusa", "Megjegyzés 1", "Megjegyzés 2",
     "Megjegyzés 3", "Megjegyzés 4"
 ]
@@ -55,6 +55,7 @@ def generate_message(data):
 *Megrendelő:* {data.get('Megrendelő', '').strip()}
 *Kapcsolattartó:* {data.get('Kapcsolattartó', '').strip()}
 *Kapcsolattartó telefonszáma:* {data.get('Telefonszám', '').strip()}
+*Fizetés módja:* {data.get('Fizetés módja', '').strip()}
 
 Bármi komolyabb program változás van, azt kérjük azonnal jelezni!!!
 
